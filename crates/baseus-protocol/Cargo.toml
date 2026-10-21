@@ -1,0 +1,10 @@
+[package]
+name = "baseus-protocol"
+description = "Baseus Bass BP1 Pro ANC frame codec, derived from the baseus-desktop captures"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[dependencies]
+thiserror.workspace = true

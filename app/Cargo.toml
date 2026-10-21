@@ -1,0 +1,43 @@
+﻿[package]
+name = "audifonos-baseus"
+description = "Control simple para los audífonos Baseus Bass BP1 Pro ANC"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[features]
+default = []
+# Lets `--mock` run the whole UI without the earbuds.
+mock = ["baseus-transport/mock"]
+
+[[bin]]
+name = "AudifonosBaseus"
+path = "src/main.rs"
+
+[dependencies]
+baseus-protocol.workspace = true
+baseus-transport.workspace = true
+eframe = { version = "0.37", default-features = false, features = [
+    "glow",
+    "accesskit",
+    "default_fonts",
+    "system_fonts",
+] }
+image = { version = "0.25", default-features = false, features = ["png"] }
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+thiserror.workspace = true
+tokio = { version = "1", features = ["sync"] }
+winreg = "0.56"
+
+[target.'cfg(windows)'.dependencies]
+windows = { version = "0.62", features = [
+    "Win32_Foundation",
+    "Win32_Security",
+    "Win32_System_LibraryLoader",
+    "Win32_System_Threading",
+    "Win32_UI_Shell",
+    "Win32_UI_WindowsAndMessaging",
+] }
+

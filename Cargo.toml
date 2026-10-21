@@ -1,0 +1,22 @@
+[workspace]
+resolver = "2"
+members = ["crates/baseus-protocol", "crates/baseus-transport", "app"]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.95"
+license = "MIT"
+
+[workspace.dependencies]
+baseus-protocol = { path = "crates/baseus-protocol" }
+baseus-transport = { path = "crates/baseus-transport" }
+thiserror = "2"
+
+# One small portable exe: full optimization, LTO, and a single codegen unit.
+[profile.release]
+opt-level = 3
+lto = "fat"
+codegen-units = 1
+panic = "abort"
+strip = true

@@ -1,0 +1,36 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+
+      - name: Build release
+        run: cargo build --release -p audifonos-baseus --no-default-features
+
+      - name: Package and checksum
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force dist | Out-Null
+          Copy-Item target/release/AudifonosBaseus.exe dist/AudifonosBaseus.exe
+          $hash = (Get-FileHash dist/AudifonosBaseus.exe -Algorithm SHA256).Hash.ToLower()
+          Set-Content -Path dist/SHA256SUMS.txt -Value "$hash  AudifonosBaseus.exe" -Encoding ascii
+
+      - name: Publish GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/AudifonosBaseus.exe
+            dist/SHA256SUMS.txt
+          generate_release_notes: true

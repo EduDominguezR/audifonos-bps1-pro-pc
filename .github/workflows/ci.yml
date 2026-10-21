@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    name: Windows x64
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - uses: Swatinem/rust-cache@v2
+
+      - name: Formato
+        run: cargo fmt --all -- --check
+
+      - name: Lints
+        run: cargo clippy --workspace --all-targets -- -D warnings
+
+      - name: Lints sin el modo simulación
+        run: cargo clippy -p audifonos-baseus --no-default-features -- -D warnings
+
+      - name: Lints con el modo simulación
+        run: cargo clippy --workspace --all-targets --features audifonos-baseus/mock -- -D warnings
+
+      - name: Pruebas
+        run: cargo test --workspace --features audifonos-baseus/mock
+
+      - name: Compilar release
+        run: cargo build --release -p audifonos-baseus --no-default-features
+
+      - name: Preparar el artefacto
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force dist | Out-Null
+          Copy-Item target/release/AudifonosBaseus.exe dist/AudifonosBaseus.exe
+          $hash = (Get-FileHash dist/AudifonosBaseus.exe -Algorithm SHA256).Hash.ToLower()
+          "$hash  AudifonosBaseus.exe" | Set-Content dist/SHA256SUMS.txt -Encoding ascii
+          Get-Item dist/AudifonosBaseus.exe | Select-Object Name, Length
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: AudifonosBaseus-windows-x64
+          path: |
+            dist/AudifonosBaseus.exe
+            dist/SHA256SUMS.txt
+          if-no-files-found: error

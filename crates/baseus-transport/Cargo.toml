@@ -1,0 +1,29 @@
+﻿[package]
+name = "baseus-transport"
+description = "Windows BLE GATT transport for Baseus earbuds, plus a simulated device"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+
+[features]
+default = []
+# Compiles the simulated earbuds used to exercise the UI without hardware.
+mock = []
+
+[dependencies]
+baseus-protocol.workspace = true
+thiserror.workspace = true
+tokio = { version = "1", features = ["sync", "rt", "time", "macros"] }
+
+[target.'cfg(windows)'.dependencies]
+windows = { version = "0.62", features = [
+    "Foundation",
+    "Foundation_Collections",
+    "Storage_Streams",
+    "Devices_Bluetooth",
+    "Devices_Bluetooth_Advertisement",
+    "Devices_Bluetooth_GenericAttributeProfile",
+    "Devices_Enumeration",
+    "Win32_System_WinRT",
+] }
